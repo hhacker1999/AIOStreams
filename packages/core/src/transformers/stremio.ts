@@ -145,18 +145,11 @@ export class StremioTransformer {
           break;
       }
     }
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
-    console.log("Reached here")
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
 
     return {
       name,
       description,
-      parsed: parsed ? (parsed as Record<string, any>) : {
-        found: false,
-      },
+      parsed: parsed ? (parsed as Record<string, any>) : {},
       url: ['http', 'usenet', 'debrid', 'live'].includes(stream.type)
         ? stream.url
         : undefined,
@@ -254,11 +247,6 @@ export class StremioTransformer {
 
     const start = Date.now();
 
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
-    console.log("Reached here first")
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
 
     transformedStreams = await Promise.all(
       streams.map((stream: ParsedStream, index: number) =>
@@ -269,11 +257,6 @@ export class StremioTransformer {
       )
     );
 
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
-    console.log("Reached here last")
-    console.log("--------------------------------------------------")
-    console.log("--------------------------------------------------")
 
     logger.info(
       `Transformed ${streams.length} streams using ${this.userData.formatter.id} formatter in ${getTimeTakenSincePoint(start)}`
