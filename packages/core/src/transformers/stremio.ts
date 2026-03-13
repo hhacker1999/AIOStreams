@@ -17,7 +17,7 @@ import {
   StreamResponse,
   ParsedMeta,
 } from '../db/index.js';
-import { createFormatter } from '../formatters/index.js';
+import { createFormatter, ParseValue } from '../formatters/index.js';
 import { AIOStreamsError, AIOStreamsResponse } from '../main.js';
 import { Cache, createLogger, getTimeTakenSincePoint } from '../utils/index.js';
 
@@ -30,7 +30,7 @@ type ErrorOptions = {
 const logger = createLogger('stremio');
 
 export class StremioTransformer {
-  constructor(private readonly userData: UserData) {}
+  constructor(private readonly userData: UserData) { }
 
   public showError(resource: Resource, errors: AIOStreamsError[]) {
     if (
@@ -48,16 +48,16 @@ export class StremioTransformer {
     formatter: {
       format: (
         stream: ParsedStream
-      ) => Promise<{ name: string; description: string }>;
+      ) => Promise<{ name: string; description: string; parsed: ParseValue }>;
     },
     index: number,
     options?: { disableAutoplay?: boolean; provideStreamData?: boolean }
   ): Promise<AIOStream> {
-    const { name, description } = stream.addon.formatPassthrough
+    const { name, description, parsed } = stream.addon.formatPassthrough
       ? {
-          name: stream.originalName || stream.addon.name,
-          description: stream.originalDescription,
-        }
+        name: stream.originalName || stream.addon.name,
+        description: stream.originalDescription,
+      }
       : await formatter.format(stream);
 
     const autoPlaySettings = {
@@ -145,10 +145,18 @@ export class StremioTransformer {
           break;
       }
     }
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
+    console.log("Reached here")
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
 
     return {
       name,
       description,
+      parsed: parsed ? (parsed as Record<string, any>) : {
+        found: false,
+      },
       url: ['http', 'usenet', 'debrid', 'live'].includes(stream.type)
         ? stream.url
         : undefined,
@@ -193,9 +201,9 @@ export class StremioTransformer {
         proxyHeaders:
           stream.requestHeaders || stream.responseHeaders
             ? {
-                request: stream.requestHeaders,
-                response: stream.responseHeaders,
-              }
+              request: stream.requestHeaders,
+              response: stream.responseHeaders,
+            }
             : undefined,
         videoHash: stream.videoHash,
         videoSize: stream.size,
@@ -203,27 +211,27 @@ export class StremioTransformer {
       },
       streamData: options?.provideStreamData
         ? {
-            type: stream.type,
-            proxied: stream.proxied,
-            indexer: stream.indexer,
-            age: stream.age,
-            duration: stream.duration,
-            library: stream.library,
-            size: stream.size,
-            folderSize: stream.folderSize,
-            torrent: stream.torrent,
-            addon: stream.addon.name,
-            filename: stream.filename,
-            folderName: stream.folderName,
-            service: stream.service,
-            parsedFile: stream.parsedFile,
-            message: stream.message,
-            regexMatched: stream.regexMatched,
-            keywordMatched: stream.keywordMatched,
-            streamExpressionMatched: stream.streamExpressionMatched,
-            seadex: stream.seadex,
-            id: stream.id,
-          }
+          type: stream.type,
+          proxied: stream.proxied,
+          indexer: stream.indexer,
+          age: stream.age,
+          duration: stream.duration,
+          library: stream.library,
+          size: stream.size,
+          folderSize: stream.folderSize,
+          torrent: stream.torrent,
+          addon: stream.addon.name,
+          filename: stream.filename,
+          folderName: stream.folderName,
+          service: stream.service,
+          parsedFile: stream.parsedFile,
+          message: stream.message,
+          regexMatched: stream.regexMatched,
+          keywordMatched: stream.keywordMatched,
+          streamExpressionMatched: stream.streamExpressionMatched,
+          seadex: stream.seadex,
+          id: stream.id,
+        }
         : undefined,
     };
   }
@@ -246,6 +254,12 @@ export class StremioTransformer {
 
     const start = Date.now();
 
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
+    console.log("Reached here first")
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
+
     transformedStreams = await Promise.all(
       streams.map((stream: ParsedStream, index: number) =>
         this.convertParsedStreamToStream(stream, formatter, index, {
@@ -254,6 +268,12 @@ export class StremioTransformer {
         })
       )
     );
+
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
+    console.log("Reached here last")
+    console.log("--------------------------------------------------")
+    console.log("--------------------------------------------------")
 
     logger.info(
       `Transformed ${streams.length} streams using ${this.userData.formatter.id} formatter in ${getTimeTakenSincePoint(start)}`
@@ -359,7 +379,7 @@ export class StremioTransformer {
     let formatter: {
       format: (
         stream: ParsedStream
-      ) => Promise<{ name: string; description: string }>;
+      ) => Promise<{ name: string; description: string; parsed: ParseValue }>;
     } | null = null;
     if (
       meta.videos?.some((video) => video.streams && video.streams.length > 0)

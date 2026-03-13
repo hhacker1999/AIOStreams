@@ -177,7 +177,7 @@ export abstract class BaseFormatter {
 
   public async format(
     stream: ParsedStream
-  ): Promise<{ name: string; description: string }> {
+  ): Promise<{ name: string; description: string, parsed: ParseValue }> {
     // Wait for template compilation to complete if it hasn't already
     await this._compilationPromise;
 
@@ -189,6 +189,7 @@ export abstract class BaseFormatter {
     return {
       name: this.precompiledNameFunction(parseValue),
       description: this.precompiledDescriptionFunction(parseValue),
+      parsed: parseValue,
     };
   }
 

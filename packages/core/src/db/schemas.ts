@@ -709,6 +709,7 @@ export const NNTPServersSchema = z.array(NNTPServerSchema);
 export type NNTPServers = z.infer<typeof NNTPServersSchema>;
 
 export const StreamSchema = z.looseObject({
+  parsed: z.record(z.string(), z.any()).optional(),
   url: z.string().or(z.null()).optional(),
   nzbUrl: z.string().or(z.null()).optional(),
   servers: z.array(z.string().min(1)).nullable().optional(),

@@ -23,6 +23,7 @@ export enum ErrorCode {
   BAD_REQUEST = 'BAD_REQUEST',
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
+  INVALID_SERVICES = 'INVALID_SERVICES',
 }
 
 interface ErrorDetails {
@@ -98,6 +99,10 @@ export const ErrorMap: Record<ErrorCode, ErrorDetails> = {
   [ErrorCode.FORBIDDEN]: {
     statusCode: 403,
     message: 'Forbidden',
+  },
+  [ErrorCode.INVALID_SERVICES]: {
+    statusCode: 400,
+    message: 'Bad request',
   },
 };
 

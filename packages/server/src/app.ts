@@ -1,4 +1,4 @@
-import express, { Request, Response, Express } from 'express';
+import express, { Request, Response, Express, Router } from 'express';
 import {
   userApi,
   healthApi,
@@ -13,6 +13,7 @@ import {
   animeApi,
   proxyApi,
   templatesApi,
+  zxyApi,
 } from './routes/api/index.js';
 import {
   configure,
@@ -48,6 +49,7 @@ import {
   staticRateLimiter,
   internalMiddleware,
   stremioStreamRateLimiter,
+  zxyConfigMiddleware,
 } from './middlewares/index.js';
 
 import { constants, createLogger, Env } from '@aiostreams/core';
@@ -108,6 +110,13 @@ apiRouter.use('/anime', animeApi);
 apiRouter.use('/proxy', proxyApi);
 apiRouter.use('/templates', templatesApi);
 app.use(`/api/v${constants.API_VERSION}`, apiRouter);
+
+// ZXY Routes
+const zxyRouter = express.Router({ mergeParams: true })
+zxyRouter.use(zxyConfigMiddleware)
+zxyRouter.use('/streams', zxyApi)
+
+app.use('/zxy', zxyRouter)
 
 // Stremio Routes
 const stremioRouter = express.Router({ mergeParams: true });
@@ -224,8 +233,7 @@ app.get(
   (req, res) => {
     const baseUrl =
       Env.BASE_URL ||
-      `${req.protocol}://${req.hostname}${
-        req.hostname === 'localhost' ? `:${Env.PORT}` : ''
+      `${req.protocol}://${req.hostname}${req.hostname === 'localhost' ? `:${Env.PORT}` : ''
       }`;
     res.json({
       streams: [
