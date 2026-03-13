@@ -149,7 +149,8 @@ export class StremioTransformer {
     return {
       name,
       description,
-      parsed: parsed ? (parsed as Record<string, any>) : {},
+      // parsed: parsed ? (parsed as Record<string, any>) : {},
+      parsed: {},
       url: ['http', 'usenet', 'debrid', 'live'].includes(stream.type)
         ? stream.url
         : undefined,
